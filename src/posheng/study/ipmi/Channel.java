@@ -1,24 +1,44 @@
 package posheng.study.ipmi;
 
-import java.net.SocketException;
-
 public abstract class Channel {
+
+	public enum PrivilegeLevel {
+		UNSPECIFIED(0x00),
+		CALLBACK(0x01),
+		USER(0x02),
+		OPERATOR(0x03),
+		ADMIN(0x04),
+		OEM(0x05);
+
+		private final int privLevel;
+
+		private PrivilegeLevel(int privLevel) {
+			this.privLevel = privLevel;
+		}
+
+		public int value() {
+			return this.privLevel;
+		}
+
+		public byte getByte() {
+			return (byte) this.privLevel;
+		}
+	}
+
 	String name;
 	String description;
 
-	int maxRequestDataSize;
-	int maxResponseDataSize;
+	int maxRequestDataSize = 0;
+	int maxResponseDataSize = 0;
 
 	boolean opened = false;
 
 	Channel(String name, String description) {
 		this.name = name;
 		this.description = description;
-		this.maxRequestDataSize = 0;
-		this.maxResponseDataSize = 0;
 	}
 
-	abstract public void open() throws SocketException;
+	abstract public void open();
 
 	abstract public void close();
 
@@ -66,7 +86,8 @@ public abstract class Channel {
 
 	@Override
 	public String toString() {
-		return "Channel [name=" + name + ", description=" + description + ", opened=" + opened + "]";
+		return String.format("Channel [name=%s, description=%s, opened=%b]",
+				name, description, opened);
 	}
 
 }
