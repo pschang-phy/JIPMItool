@@ -1,7 +1,9 @@
 package posheng.study.ipmi;
 
+import static java.lang.String.format;
+
 public class Message {
-	
+
 	public enum NetworkFunction {
 		CHASSIS(0x00),
 		CHASSIS_RSP(0x01),
@@ -24,40 +26,77 @@ public class Message {
 			this.netFn = netFn;
 		}
 
-		public int getByteValue() {
+		public int value() {
 			return this.netFn;
+		}
+
+		public byte getByte() {
+			return (byte) this.netFn;
 		}
 	}
 
 	NetworkFunction netFn;
-	int lun;
+	int lun = 0;
 	int command;
-	int[] data;
+	int[] data = null;
 
-	public Message() {
-		this.netFn = NetworkFunction.APP;
-		this.lun = 0;
-		this.command = 0;
-		this.data = null;
+	public Message(NetworkFunction netFn, int cmd) {
+		setNetFn(netFn);
+		setCommand(cmd);
 	}
 
-	Message setNetFn(NetworkFunction netFn) {
+	public NetworkFunction getNetFn() {
+		return netFn;
+	}
+
+	public void setNetFn(NetworkFunction netFn) {
 		this.netFn = netFn;
-		return this;
 	}
 
-	Message setLUN(int lun) {
+	public int getLun() {
+		return lun;
+	}
+
+	public void setLun(int lun) {
 		this.lun = lun;
-		return this;
 	}
 
-	Message setCommand(int command) {
+	public int getCommand() {
+		return command;
+	}
+
+	public void setCommand(int command) {
 		this.command = command;
-		return this;
 	}
 
-	Message setData(int[] data) {
-		this.data = data;
-		return this;
+	public int[] getData() {
+		return data;
 	}
+
+	public void setData(int[] data) {
+		this.data = data;
+	}
+
+	@Override
+	public String toString() {
+		String output = format("Message [netFn=%s, lun=%d, command=0x%02X]\n",
+				netFn, lun, command);
+
+		if (null != data) {
+			output += format("  Data (%d %s)", data.length,
+					data.length > 1 ? "bytes" : "byte");
+
+			for (int i = 0; i < data.length; i++) {
+				if (0 == (i & 0x0F))
+					output += "\n   ";
+				output += format(" %02X", data[i] & 0xFF);
+			}
+
+		} else {
+			output += "  Empty data";
+		}
+
+		return output;
+	}
+
 }
